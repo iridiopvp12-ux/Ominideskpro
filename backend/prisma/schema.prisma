@@ -1,0 +1,94 @@
+// 1. CONFIGURAÇÕES GERAIS
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 2. MODELOS (TABELAS)
+
+// Funcionários do Escritório
+model User {
+  id           String      @id @default(uuid())
+  name         String
+  email        String      @unique
+  password     String
+  role         String      @default("AGENT") // ADMIN, AGENT
+  createdAt    DateTime    @default(now())
+  
+  // Um usuário pertence a um setor (Opcional, pois Admin pode não ter setor)
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+  
+  // Um usuário pode ter vários tickets atribuídos a ele
+  tickets      Ticket[]
+}
+
+// Setores (Jurídico, Triagem, Financeiro...)
+model Department {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  
+  users     User[]
+  tickets   Ticket[]
+}
+
+// Clientes (WhatsApp)
+model Contact {
+  id            String    @id // Número do WhatsApp (ex: 551199999999)
+  name          String?   // Nome salvo na agenda ou identificado
+  pushName      String?   // Nome público do WhatsApp
+  profilePicUrl String?
+  isAiActive    Boolean   @default(true)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  messages      Message[]
+  tickets       Ticket[]
+}
+
+// Chamados / Atendimentos
+model Ticket {
+  id          String   @id @default(uuid())
+  title       String   // Título ou Resumo do problema
+  status      String   @default("todo") // todo (A Fazer), doing (Andamento), done (Feito)
+  priority    String   @default("medium") // low, medium, high
+  
+  summary     Json?    // Relatório completo da IA (salvo como JSON)
+  closingNote String?  // Observação final ao encerrar o chamado
+  
+  // Relacionamentos
+  contactId   String
+  // Se deletar o contato, deleta os tickets dele (Cascade)
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  
+  assignedToId String?
+  assignedTo   User?    @relation(fields: [assignedToId], references: [id])
+
+  departmentId String?
+  department   Department? @relation(fields: [departmentId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Histórico de Mensagens
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String   // Texto da mensagem
+  mediaType String   @default("text")
+  
+  fromMe    Boolean  // true = Enviado por nós/IA, false = Enviado pelo cliente
+  isAi      Boolean  @default(false) // true = Foi a IA que escreveu
+  
+  contactId String
+  // Se deletar o contato, deleta as mensagens dele (Cascade)
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+}

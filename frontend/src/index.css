@@ -1,0 +1,20 @@
+/*
+ * O Tailwind 4 (e versões anteriores) requer que apaguemos todos os estilos padrão do body,
+ * para que ele possa injetar seu próprio CSS de reset (Preflight).
+ * O código do Tailwind 4 é apenas este import:
+ */
+@import "tailwindcss";
+
+/*
+ * Se você precisar de estilos globais adicionais (como para o scrollbar),
+ * adicione-os ABAIXO do @import.
+ */
+
+/* Exemplo de Scrollbar mais fino para melhor UX */
+.overflow-y-auto::-webkit-scrollbar {
+  width: 8px;
+}
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1; /* slate-300 */
+  border-radius: 4px;
+}
