@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 // 2. MODELOS (TABELAS)
@@ -59,7 +59,7 @@ model Ticket {
   status      String   @default("todo") // todo (A Fazer), doing (Andamento), done (Feito)
   priority    String   @default("medium") // low, medium, high
   
-  summary     Json?    // Relatório completo da IA (salvo como JSON)
+  summary     String?    // Relatório completo da IA (salvo como JSON)
   closingNote String?  // Observação final ao encerrar o chamado
   
   // Relacionamentos

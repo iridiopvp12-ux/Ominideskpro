@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "ts-node src/server.ts",
+    "dev": "npx prisma db push --accept-data-loss && ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"
   },
@@ -29,6 +29,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/mime-types": "^3.0.1",
     "@types/node": "^24.10.2",
     "@types/qrcode-terminal": "^0.12.2",
     "autoprefixer": "^10.4.22",
